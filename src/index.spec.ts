@@ -1,10 +1,8 @@
 import { addGitTag } from "./index";
 
 jest.mock("child_process", () => ({ spawnSync: jest.fn() }));
-jest.mock("wait-on", () => ({ default: jest.fn(), __esModule: true }));
 
 import { spawnSync } from "child_process";
-import waitOn from "wait-on";
 import { existsSync, unlinkSync, writeFileSync } from "fs";
 import path from "path";
 
@@ -23,16 +21,17 @@ describe("addGitTag tests", () => {
     (spawnSync as jest.Mock).mockReturnValue({});
     await addGitTag();
     expect(spawnSync).toBeCalled();
-    expect(waitOn).toBeCalled();
   });
 
-  it("should return git tag command error", async () => {
+  it("should return waitForDescription command error", async () => {
     (spawnSync as jest.Mock).mockReturnValue({ error: new Error("coverage") });
     expect(addGitTag).rejects.toThrowError("coverage");
   });
 
-  it("should return git tag command stderr", async () => {
-    (spawnSync as jest.Mock).mockReturnValue({ stderr: new Error("coverage") });
+  it("should return git command error", async () => {
+    (spawnSync as jest.Mock)
+      .mockReturnValueOnce({})
+      .mockReturnValue({ error: new Error("coverage") });
     expect(addGitTag).rejects.toThrowError("coverage");
   });
 
@@ -46,22 +45,11 @@ describe("addGitTag tests", () => {
     expect(addGitTag).rejects.toThrowError("coverage");
   });
 
-  it("should return git tag push command stderr", async () => {
-    (spawnSync as jest.Mock)
-      .mockReturnValueOnce({})
-      .mockReturnValueOnce({})
-      .mockReturnValueOnce({
-        stderr: new Error("coverage"),
-      });
-    expect(addGitTag).rejects.toThrowError("coverage");
-  });
-
   it("should not find file tag-description and create", async () => {
     unlinkSync(path.resolve(__dirname, "../.tag-description"));
     (spawnSync as jest.Mock).mockReturnValue({});
     await addGitTag();
     expect(spawnSync).toBeCalled();
-    expect(waitOn).toBeCalled();
   });
 
   it("should find long description", async () => {
@@ -73,7 +61,6 @@ describe("addGitTag tests", () => {
     (spawnSync as jest.Mock).mockReturnValue({});
     await addGitTag();
     expect(spawnSync).toBeCalled();
-    expect(waitOn).toBeCalled();
   });
 
   it("should not find package.json", async () => {

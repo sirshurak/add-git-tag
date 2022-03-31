@@ -1,15 +1,16 @@
 import { spawnSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import waitOn from "wait-on";
 
-export const createTag = (version, description: string) => {
-  const git = spawnSync("git", ["tag", "-a", version, description]);
+export const createTag = (version, description: string[]) => {
+  const git = spawnSync("git", [
+    "tag",
+    "-a",
+    version,
+    ...description.map((d) => ["-m", d]).flat(),
+  ]);
   if (git.error) {
     throw git.error;
-  }
-  if (git.stderr) {
-    throw new Error(git.stderr.toString());
   }
 };
 
@@ -21,22 +22,19 @@ export const waitForDescription = async () => {
     fs.writeFileSync(tagDescriptionPath, "", "utf-8");
   }
 
-  spawnSync("open", [tagDescriptionPath]);
-  await waitOn({
-    resources: [tagDescriptionPath],
+  console.log(
+    "Please, save the description for the tag and close the file to continue"
+  );
+  const code = spawnSync("code", [`"${tagDescriptionPath}"`, "-w"], {
+    shell: true,
   });
-
+  if (code.error) {
+    throw code.error;
+  }
   tagDescription = fs.readFileSync(tagDescriptionPath, "utf-8");
 
-  if (!tagDescription) {
-    console.warn("No description provided.");
-  } else {
-    tagDescription = tagDescription
-      .split("\n")
-      .map((line) => `-m "${!line ? " " : line}"`)
-      .join(" ");
-  }
-  return tagDescription;
+  if (!tagDescription) console.warn("No description provided.");
+  return tagDescription.split("\n").map((line) => `${!line ? " " : line}`);
 };
 
 export const findPackageVersion = (packagePath: string): string | void => {
@@ -53,14 +51,11 @@ export const findPackageVersion = (packagePath: string): string | void => {
   return packageJson.version;
 };
 
-export const createTagAndPush = (version, description: string) => {
+export const createTagAndPush = (version, description: string[]) => {
   createTag(version, description);
   const git = spawnSync("git", ["push", "--tags"]);
   if (git.error) {
     throw git.error;
-  }
-  if (git.stderr) {
-    throw new Error(git.stderr.toString());
   }
 };
 
