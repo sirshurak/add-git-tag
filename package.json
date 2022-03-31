@@ -1,0 +1,52 @@
+{
+  "name": "add-git-tag",
+  "version": "0.0.1",
+  "description": "Add new git tag to project",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "bin": {
+    "sitemap-merger": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "cli": "ts-node src/cli.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "commander": "^9.1.0",
+    "wait-on": "^6.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-typescript": "^7.16.0",
+    "@types/jest": "^27.0.3",
+    "@types/node": "^16.11.12",
+    "babel-jest": "^27.4.2",
+    "jest": "^27.4.3",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.4.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sirshurak/add-git-tag.git"
+  },
+  "keywords": [
+    "git",
+    "tag",
+    "add",
+    "create",
+    "package"
+  ],
+  "author": "Vinicius Tonelli",
+  "bugs": {
+    "url": "https://github.com/sirshurak/add-git-tag/issues"
+  },
+  "homepage": "https://github.com/sirshurak/add-git-tag#readme"
+}

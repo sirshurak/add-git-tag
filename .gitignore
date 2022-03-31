@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.npmrc
+tests
+yarn-error.log
+.tag-description
