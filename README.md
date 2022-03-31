@@ -1,4 +1,4 @@
-# sitemap-merger
+# add-git-tag
 
 A simple CLI and npm package to generate git tag with vscode and node projects.
 
