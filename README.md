@@ -1,33 +1,23 @@
 # sitemap-merger
 
-A simple CLI and npm package to merge sitemaps together.
-
-This project is based on deprecated project [merge-sitemaps](https://github.com/rdilweb/merge-sitemaps)
+A simple CLI and npm package to generate git tag with vscode and node projects.
 
 ## Usage
 
-It will merge all child **url** comparing the text from tag **loc** from sitemap A to B resulting C.
+You will need to have [git](https://git-scm.com/downloads) + [vscode](https://code.visualstudio.com/Download) installed and CLI commands like `git` + `code` properly working.
 
 ### With CLI
 
 ```bash
-$ npx sitemap-merger sitemap.xml subdir/other-sitemap.xml build/sitemap.xml --format
+$ npx add-git-tag
 ```
-
-(With the CLI, argument 1 is the base sitemap, argument 2 is the secondary sitemap, and argument 3 is the destination for the output.)
 
 ### With API
 
 ```js
-const sitemapMerger = require("sitemap-merger");
+const { addGitTag } = require("add-git-tag");
 
-console.log(
-  sitemapMerger.merge(
-    "base-xml-sitemap-as-string",
-    "secondary-xml-sitemap-as-string",
-    { format: true }
-  )
-);
+addGitTag("/path/to/package");
 ```
 
 ## License
