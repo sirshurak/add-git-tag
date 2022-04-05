@@ -17,8 +17,17 @@ $ npx add-git-tag
 ```js
 const { addGitTag } = require("add-git-tag");
 
-addGitTag("/path/to/package");
+addGitTag({ packagePath: "/path/to/package" });
 ```
+
+#### Options
+
+| Value       | CLI                                | Type     | Required | Notes                                                                                             |
+| ----------- | ---------------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------- |
+| append      | `-a, --append <append>`            | `String` | No       | Append text to tag version. Ex: --append -beta for 1.0.0-beta                                     |
+| prepend     | `-p, --prepend <prepend>`          | `String` | No       | Prepend text to tag version. Ex: --append v for v1.0.0                                            |
+| packagePath | `-f, --package-path <packagePath>` | `String` | No       | Path for the package.json file. Default: current directory                                        |
+| description | `-d, --description <description>`  | `String` | No       | Description for the tag. Default: empty. To skip description file on CLI: `-nd, --no-description` |
 
 ## License
 

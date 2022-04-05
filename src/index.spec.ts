@@ -1,4 +1,4 @@
-import { addGitTag } from "./index";
+import { addGitTag, defaultGitTagOptions } from "./index";
 
 jest.mock("child_process", () => ({ spawnSync: jest.fn() }));
 
@@ -19,20 +19,38 @@ describe("addGitTag tests", () => {
 
   it("should add a git tag", async () => {
     (spawnSync as jest.Mock).mockReturnValue({});
-    await addGitTag();
+    await addGitTag(defaultGitTagOptions);
+    expect(spawnSync).toBeCalled();
+  });
+
+  it("should add a git tag with description", async () => {
+    (spawnSync as jest.Mock).mockReturnValue({});
+    await addGitTag({ ...defaultGitTagOptions, description: "Test" });
+    expect(spawnSync).toBeCalled();
+  });
+
+  it("should add a git tag without description", async () => {
+    (spawnSync as jest.Mock).mockReturnValue({});
+    await addGitTag({ ...defaultGitTagOptions, description: false });
+    expect(spawnSync).toBeCalled();
+  });
+
+  it("should add a git tag without prepend and append", async () => {
+    (spawnSync as jest.Mock).mockReturnValue({});
+    await addGitTag({ ...defaultGitTagOptions, prepend: null, append: null });
     expect(spawnSync).toBeCalled();
   });
 
   it("should return waitForDescription command error", async () => {
     (spawnSync as jest.Mock).mockReturnValue({ error: new Error("coverage") });
-    expect(addGitTag).rejects.toThrowError("coverage");
+    expect(addGitTag(defaultGitTagOptions)).rejects.toThrowError("coverage");
   });
 
   it("should return git command error", async () => {
     (spawnSync as jest.Mock)
       .mockReturnValueOnce({})
       .mockReturnValue({ error: new Error("coverage") });
-    expect(addGitTag).rejects.toThrowError("coverage");
+    expect(addGitTag(defaultGitTagOptions)).rejects.toThrowError("coverage");
   });
 
   it("should return git tag push command error", async () => {
@@ -42,13 +60,13 @@ describe("addGitTag tests", () => {
       .mockReturnValueOnce({
         error: new Error("coverage"),
       });
-    expect(addGitTag).rejects.toThrowError("coverage");
+    expect(addGitTag(defaultGitTagOptions)).rejects.toThrowError("coverage");
   });
 
   it("should not find file tag-description and create", async () => {
     unlinkSync(path.resolve(__dirname, "../.tag-description"));
     (spawnSync as jest.Mock).mockReturnValue({});
-    await addGitTag();
+    await addGitTag(Object.assign(defaultGitTagOptions, { description: true }));
     expect(spawnSync).toBeCalled();
   });
 
@@ -59,20 +77,22 @@ describe("addGitTag tests", () => {
       "utf-8"
     );
     (spawnSync as jest.Mock).mockReturnValue({});
-    await addGitTag();
+    await addGitTag(Object.assign(defaultGitTagOptions, { description: true }));
     expect(spawnSync).toBeCalled();
   });
 
   it("should not find package.json", async () => {
     (spawnSync as jest.Mock).mockReturnValue({});
-    expect(addGitTag(__dirname)).rejects.toThrowError("package.json not found");
+    expect(
+      addGitTag(Object.assign(defaultGitTagOptions, { packagePath: __dirname }))
+    ).rejects.toThrowError("package.json not found");
   });
 
   it("should not find package.json version", async () => {
     writeFileSync(localPackagePath, "{}", "utf-8");
     (spawnSync as jest.Mock).mockReturnValue({});
-    expect(addGitTag(__dirname)).rejects.toThrowError(
-      "package.json version not found"
-    );
+    expect(
+      addGitTag(Object.assign(defaultGitTagOptions, { packagePath: __dirname }))
+    ).rejects.toThrowError("package.json version not found");
   });
 });

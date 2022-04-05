@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 import { program } from "commander";
-import { addGitTag } from "./index";
+import { addGitTag, defaultGitTagOptions } from "./index";
 
-const dispatch = () => {
-  return addGitTag();
+const dispatch = (options) => {
+  const entryOptions = Object.assign({}, defaultGitTagOptions, options);
+  return addGitTag(entryOptions);
 };
 
 const withErrors = (command: (...args) => Promise<void>) => {
@@ -18,6 +19,25 @@ const withErrors = (command: (...args) => Promise<void>) => {
   };
 };
 
-program.name("add-git-tag").action(withErrors(dispatch));
+program
+  .name("add-git-tag")
+  .option(
+    "-a, --append <append>",
+    "Append text to tag version. Ex: --append -beta for 1.0.0-beta"
+  )
+  .option(
+    "-p, --prepend <prepend>",
+    "Prepend text to tag version. Ex: --append v for v1.0.0"
+  )
+  .option(
+    "-f, --package-path <packagePath>",
+    "Path for the package.json file. Default: current directory"
+  )
+  .option("-nd, --no-description", "No description for the tag. Default: false")
+  .option(
+    "-d, --description <description>",
+    "Description for the tag. Default: empty"
+  )
+  .action(withErrors(dispatch));
 
 program.parse(process.argv);
