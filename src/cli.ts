@@ -3,12 +3,12 @@
 import { program } from "commander";
 import { addGitTag, defaultGitTagOptions } from "./index";
 
-const dispatch = (options) => {
+export const dispatch = (options) => {
   const entryOptions = Object.assign({}, defaultGitTagOptions, options);
   return addGitTag(entryOptions);
 };
 
-const withErrors = (command: (...args) => Promise<void>) => {
+export const withErrors = (command: (...args) => Promise<void>) => {
   return async (...args: any[]) => {
     try {
       await command(...args);
@@ -37,6 +37,14 @@ program
   .option(
     "-d, --description <description>",
     "Description for the tag. Default: empty"
+  )
+  .option(
+    "-r, --release <releaser>",
+    "Release a version for remote integration. Possible values (jira). Ex: --release jira"
+  )
+  .option(
+    "-c, --config <configFile>",
+    "Configuration file path to load. Ex: --config path/to/config/file.json"
   )
   .action(withErrors(dispatch));
 
