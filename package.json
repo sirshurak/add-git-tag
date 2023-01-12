@@ -1,6 +1,6 @@
 {
   "name": "add-git-tag",
-  "version": "unstable-v1.2.0",
+  "version": "v1.2.0-unstable",
   "description": "Add new git tag to project",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
