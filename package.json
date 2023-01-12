@@ -1,6 +1,6 @@
 {
   "name": "add-git-tag",
-  "version": "v1.2.0-unstable",
+  "version": "v1.2.0",
   "description": "Add new git tag to project",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,8 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "cli": "ts-node src/cli.ts",
-    "covdev": "jest --coverage --watchAll"
+    "covdev": "jest --coverage --watchAll",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "axios": "^1.2.2",

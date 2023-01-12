@@ -54,6 +54,6 @@ export class JiraRelease extends Release<JiraApi> {
       `\\W?[^\\(](${this.config.jira.projectKey}-\\d*)[^\\)]\\W?`,
       "gm"
     );
-    return description.match(regExp).map((e) => e.replace(regExp, "$1"));
+    return description.match(regExp)?.map((e) => e.replace(regExp, "$1")) ?? [];
   }
 }

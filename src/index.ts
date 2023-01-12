@@ -15,8 +15,8 @@ export interface GitTagOptions {
   prepend: string;
   packagePath: string;
   description: boolean | string;
-  releaser?: "jira";
-  configFile?: string;
+  release?: "jira";
+  config?: string;
 }
 
 export const defaultGitTagOptions: GitTagOptions = {
@@ -24,8 +24,8 @@ export const defaultGitTagOptions: GitTagOptions = {
   prepend: "",
   packagePath: process.cwd(),
   description: true,
-  releaser: null,
-  configFile: null,
+  release: null,
+  config: null,
 };
 
 export const createTag = (version, description: string[]) => {
@@ -94,8 +94,8 @@ export const createTagAndPush = (version, description: string[]) => {
 };
 
 export const getConfig = async (options: Partial<GitTagOptions>) => {
-  let config = loadConfig(options.configFile);
-  if (options.releaser) {
+  let config = loadConfig(options.config);
+  if (options.release) {
     await inquirersAsk(config);
     saveConfig(config);
   }
@@ -170,7 +170,7 @@ export const release = async (
     description,
     branchType,
   });
-  switch (options.releaser) {
+  switch (options.release) {
     case "jira":
       console.log(`Creating/updating ${releaseName} on Jira...`);
       if (await new JiraProvider(config).doRelease(releaseName, description))

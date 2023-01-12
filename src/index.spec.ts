@@ -224,7 +224,7 @@ describe("addGitTag tests", () => {
 
   it("should get config", async () => {
     writeFileSync(localConfigPath, JSON.stringify(configStatic), "utf-8");
-    const config = await getConfig({ configFile: localConfigPath });
+    const config = await getConfig({ config: localConfigPath });
     expect(config.filePath).toBe(localConfigPath);
   });
 
@@ -236,12 +236,12 @@ describe("addGitTag tests", () => {
       config.jira.apiUrl = "apiUrl";
     });
     const config = await getConfig({
-      configFile: localConfigPath,
-      releaser: "jira",
+      config: localConfigPath,
+      release: "jira",
     });
     expect(config.filePath).toBe(localConfigPath);
     expect(inquirersAsk).toBeCalled();
-    const config2 = await getConfig({ configFile: localConfigPath });
+    const config2 = await getConfig({ config: localConfigPath });
     expect(config2.jira).toMatchObject(config.jira);
   });
 
@@ -257,8 +257,8 @@ describe("addGitTag tests", () => {
       release(
         {
           ...defaultGitTagOptions,
-          configFile: localConfigPath,
-          releaser: "jira",
+          config: localConfigPath,
+          release: "jira",
         },
         { name: "test" },
         "v1.1.1",
