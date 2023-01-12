@@ -8,7 +8,7 @@
     "/dist"
   ],
   "bin": {
-    "sitemap-merger": "dist/cli.js"
+    "add-git-tag": "dist/cli.js"
   },
   "scripts": {
     "build": "rimraf dist && tsc",

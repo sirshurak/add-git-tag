@@ -40,7 +40,7 @@ program
   )
   .option(
     "-r, --release <releaser>",
-    "Release a version for remote integration. Possible values (bitbucket). Ex: --release bitbucket"
+    "Release a version for remote integration. Possible values (jira). Ex: --release jira"
   )
   .option(
     "-c, --config <configFile>",

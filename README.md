@@ -28,6 +28,8 @@ addGitTag({ packagePath: "/path/to/package" });
 | prepend     | `-p, --prepend <prepend>`          | `String` | No       | Prepend text to tag version. Ex: --append v for v1.0.0                                            |
 | packagePath | `-f, --package-path <packagePath>` | `String` | No       | Path for the package.json file. Default: current directory                                        |
 | description | `-d, --description <description>`  | `String` | No       | Description for the tag. Default: empty. To skip description file on CLI: `-nd, --no-description` |
+| release     | `-r, --release <releaser>`         | `jira`   | No       | Release a version for remote integration. Possible values (jira). Ex: `--release jira`            |
+| config      | `-c, --config <configFile>`        | `jira`   | No       | Configuration file path to load. Ex: `--config path/to/config/file.json`                          |
 
 ## License
 
