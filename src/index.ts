@@ -1,12 +1,22 @@
 import { spawnSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import lodashGet from "lodash.get";
+import {
+  parseStringTemplate,
+  evaluateParsedString,
+} from "string-template-parser";
+import { Config, loadConfig, saveConfig } from "./config";
+import { JiraProvider } from "./provider/jira";
+import inquirersAsk from "./inquirers";
 
 export interface GitTagOptions {
   append: string;
   prepend: string;
   packagePath: string;
   description: boolean | string;
+  releaser?: "jira";
+  configFile?: string;
 }
 
 export const defaultGitTagOptions: GitTagOptions = {
@@ -14,6 +24,8 @@ export const defaultGitTagOptions: GitTagOptions = {
   prepend: "",
   packagePath: process.cwd(),
   description: true,
+  releaser: null,
+  configFile: null,
 };
 
 export const createTag = (version, description: string[]) => {
@@ -55,7 +67,7 @@ export const waitForDescription = async (description: boolean | string) => {
   return tagDescription.split("\n").map((line) => `${!line ? " " : line}`);
 };
 
-export const findPackageVersion = (packagePath: string): string | void => {
+export const findPackage = (packagePath: string): any => {
   const appDirectory = fs.realpathSync(packagePath);
   const packageFilePath = path.resolve(`${appDirectory}`, "package.json");
   if (!fs.existsSync(packageFilePath)) {
@@ -63,6 +75,10 @@ export const findPackageVersion = (packagePath: string): string | void => {
   }
   const packageFile: string = fs.readFileSync(packageFilePath, "utf-8");
   const packageJson: any = JSON.parse(packageFile);
+  return packageJson;
+};
+
+export const findPackageVersion = (packageJson: any): string | void => {
   if (!packageJson.version) {
     throw new Error("package.json version not found");
   }
@@ -77,13 +93,97 @@ export const createTagAndPush = (version, description: string[]) => {
   }
 };
 
+export const getConfig = async (options: Partial<GitTagOptions>) => {
+  let config = loadConfig(options.configFile);
+  if (options.releaser) {
+    await inquirersAsk(config);
+    saveConfig(config);
+  }
+  return config;
+};
+
+export const getVersion = (options: Partial<GitTagOptions>, packageJson: any) =>
+  `${options.prepend ?? ""}${findPackageVersion(packageJson)}${
+    options.append ?? ""
+  }`;
+
+export const getDescription = async (options: Partial<GitTagOptions>) =>
+  options.description ? await waitForDescription(options.description) : [""];
+
+export const getReleaseName = (
+  config: Config,
+  template: {
+    packageJson: any;
+    version: string;
+    description: string;
+    branchType: string;
+  }
+) => {
+  const parsedString = parseStringTemplate(config.releaseName);
+  const variables = {};
+  parsedString.variables.forEach((variable) => {
+    variables[variable.name] = lodashGet(
+      { ...template, separator: config.releaseNameSeparator },
+      variable.name
+    );
+  });
+  let result = evaluateParsedString(parsedString, variables, {});
+  if (result.endsWith(config.releaseNameSeparator))
+    result = result.substring(
+      0,
+      result.length - config.releaseNameSeparator.length
+    );
+  return result;
+};
+
+export const getCurrentBranch = () => {
+  const git = spawnSync("git", ["branch", "--show-current"], {
+    encoding: "utf8",
+  });
+  if (git.error) {
+    throw git.error;
+  }
+  return git.stdout;
+};
+
+export const getBranchType = (config: Config) => {
+  const branchName = getCurrentBranch();
+  if (branchName.includes(config.branchTypeSeparator))
+    return branchName.substring(
+      0,
+      branchName.indexOf(config.branchTypeSeparator)
+    );
+  return "";
+};
+
+export const release = async (
+  options: Partial<GitTagOptions>,
+  packageJson: any,
+  version: string,
+  description: string
+) => {
+  const config = await getConfig(options);
+  const branchType = getBranchType(config);
+  const releaseName = getReleaseName(config, {
+    packageJson,
+    version,
+    description,
+    branchType,
+  });
+  switch (options.releaser) {
+    case "jira":
+      console.log(`Creating/updating ${releaseName} on Jira...`);
+      if (await new JiraProvider(config).doRelease(releaseName, description))
+        console.log(`Release ${releaseName} created/updated at Jira.`);
+      break;
+  }
+  return true;
+};
+
 export const addGitTag = async (options: Partial<GitTagOptions>) => {
-  const description = options.description
-    ? await waitForDescription(options.description)
-    : [""];
-  const version = `${options.prepend ?? ""}${findPackageVersion(
-    options.packagePath
-  )}${options.append ?? ""}`;
+  const packageJson = findPackage(options.packagePath);
+  const description = await getDescription(options);
+  const version = getVersion(options, packageJson);
   createTagAndPush(version, description);
   console.log(`Tag ${version} created and pushed to remote`);
 };
