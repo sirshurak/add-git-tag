@@ -33,19 +33,20 @@ addGitTag({ packagePath: "/path/to/package" });
 
 ##### Config File structure
 
-```json
+```yaml
 {
-  "releaseName": "String", // Default: "${packageJson.name}${separator}${version}${separator}${branchType}"
-  "releaseNameSeparator": "String", // Default: "-"
-  "branchTypeSeparator": "String", // Default: "/"
-  "jira": {
-    "email": "String",
-    "token": "String",
-    "apiUrl": "String",
-    "projectName": "String",
-    "projectId": 0,
-    "projectKey": "String"
-  }
+  "releaseName": "String", # Default: "${packageJson.name}${separator}${version}${separator}${branchType}"
+  "releaseNameSeparator": "String", # Default: "-"
+  "branchTypeSeparator": "String", # Default: "/"
+  "jira":
+    {
+      "email": "String",
+      "token": "String",
+      "apiUrl": "String",
+      "projectName": "String",
+      "projectId": 0,
+      "projectKey": "String",
+    },
 }
 ```
 
