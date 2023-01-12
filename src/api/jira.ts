@@ -1,9 +1,9 @@
 import { Api } from ".";
 
 export class JiraApi extends Api {
-  constructor(username: string, password: string, baseUrl: string) {
+  constructor(username: string, password: string, baseURL: string) {
     super({
-      url: baseUrl,
+      baseURL,
       auth: {
         username,
         password,

@@ -8,6 +8,6 @@ const jira = [askJiraApiUrl, askJiraEmail, askJiraToken, askJiraProjectName];
 
 export default async function inquirersAsk(config: Config) {
   if (!config.jira) config.jira = new JiraConfig();
-  await Promise.all(jira.map(async (ask) => await ask(config)));
+  for (const ask of jira) await ask(config);
   return config;
 }

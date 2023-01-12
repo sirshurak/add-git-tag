@@ -17,7 +17,7 @@ describe("JiraApi Class", () => {
   it("should create axios instance", () => {
     new JiraApi("username", "password", "url");
     expect(axios.create).toBeCalledWith({
-      url: "url",
+      baseURL: "url",
       auth: {
         username: "username",
         password: "password",

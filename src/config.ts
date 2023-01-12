@@ -22,9 +22,9 @@ export class ConfigJson {
 export class Config extends ConfigJson {
   constructor(public filePath?: string) {
     super();
-    if (filePath)
-      this.copyProps(JSON.parse(fs.readFileSync(filePath, "utf8")), this);
-    else this.filePath = path.resolve("../config.json", __dirname);
+    if (!filePath) this.filePath = path.join(__dirname, "../config.json");
+    if (fs.existsSync(this.filePath))
+      this.copyProps(JSON.parse(fs.readFileSync(this.filePath, "utf8")), this);
   }
 
   copyProps = (from, to) => {
