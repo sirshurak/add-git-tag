@@ -147,7 +147,7 @@ export const getCurrentBranch = () => {
 };
 
 export const getBranchType = (config: Config) => {
-  const branchName = getCurrentBranch();
+  const branchName = getCurrentBranch() ?? "";
   if (branchName.includes(config.branchTypeSeparator))
     return branchName.substring(
       0,
@@ -186,4 +186,5 @@ export const addGitTag = async (options: Partial<GitTagOptions>) => {
   const version = getVersion(options, packageJson);
   createTagAndPush(version, description);
   console.log(`Tag ${version} created and pushed to remote`);
+  await release(options, packageJson, version, description.join("\n"));
 };
