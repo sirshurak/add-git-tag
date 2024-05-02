@@ -133,7 +133,7 @@ describe("addGitTag tests", () => {
       config.jira.token = "token";
       config.jira.apiUrl = "apiUrl";
     });
-    await addGitTag(Object.assign(defaultGitTagOptions, { description: true }));
+    await addGitTag(Object.assign({}, defaultGitTagOptions, { description: true }));
     expect(spawnSync).toBeCalled();
   });
 
@@ -149,8 +149,39 @@ describe("addGitTag tests", () => {
       config.jira.token = "token";
       config.jira.apiUrl = "apiUrl";
     });
-    await addGitTag(Object.assign(defaultGitTagOptions, { description: true }));
+    await addGitTag(Object.assign({}, defaultGitTagOptions, { description: true }));
     expect(spawnSync).toBeCalled();
+  });
+
+  it("should find long description file", async () => {
+    const pathTestFile = path.resolve(__dirname, "../.tag-description");
+    writeFileSync(
+      pathTestFile,
+      "test\n\ntest\ntest",
+      "utf-8"
+    );
+    (spawnSync as jest.Mock).mockReturnValue({});
+    (inquirersAsk as jest.Mock).mockImplementation((config) => {
+      config.jira.email = "email@email.com.br";
+      config.jira.token = "token";
+      config.jira.apiUrl = "apiUrl";
+    });
+    await addGitTag(Object.assign({}, defaultGitTagOptions, { descriptionFile: pathTestFile }));
+    expect(spawnSync).toBeCalled();
+  });
+
+  it("should not find file tag-description file and create", async () => {
+    const pathTestFile = path.resolve(__dirname, "../.tag-description");
+    unlinkSync(pathTestFile);
+    (spawnSync as jest.Mock).mockReturnValue({});
+    (inquirersAsk as jest.Mock).mockImplementation((config) => {
+      config.jira.email = "email@email.com.br";
+      config.jira.token = "token";
+      config.jira.apiUrl = "apiUrl";
+    });
+    expect(
+      addGitTag(Object.assign({}, defaultGitTagOptions, { descriptionFile: pathTestFile }))
+    ).rejects.toThrowError("Description file not found");
   });
 
   it("should not find package.json", async () => {
@@ -161,7 +192,7 @@ describe("addGitTag tests", () => {
       config.jira.apiUrl = "apiUrl";
     });
     expect(
-      addGitTag(Object.assign(defaultGitTagOptions, { packagePath: __dirname }))
+      addGitTag(Object.assign({}, defaultGitTagOptions, { packagePath: __dirname }))
     ).rejects.toThrowError("package.json not found");
   });
 
@@ -174,7 +205,7 @@ describe("addGitTag tests", () => {
       config.jira.apiUrl = "apiUrl";
     });
     expect(
-      addGitTag(Object.assign(defaultGitTagOptions, { packagePath: __dirname }))
+      addGitTag(Object.assign({}, defaultGitTagOptions, { packagePath: __dirname }))
     ).rejects.toThrowError("package.json version not found");
   });
 

@@ -15,6 +15,7 @@ export interface GitTagOptions {
   prepend: string;
   packagePath: string;
   description: boolean | string;
+  descriptionFile: string;
   release?: "jira";
   config?: string;
 }
@@ -24,6 +25,7 @@ export const defaultGitTagOptions: GitTagOptions = {
   prepend: "",
   packagePath: process.cwd(),
   description: true,
+  descriptionFile: "",
   release: null,
   config: null,
 };
@@ -40,9 +42,15 @@ export const createTag = (version, description: string[]) => {
   }
 };
 
-export const waitForDescription = async (description: boolean | string) => {
+export const waitForDescription = async (description: boolean | string, descriptionFile: string) => {
   let tagDescription = "";
-  if (description === true) {
+  if (descriptionFile) {
+    const tagDescriptionPath = path.resolve(__dirname, descriptionFile);
+    if (!fs.existsSync(tagDescriptionPath)) {
+      throw new Error("Description file not found");
+    }
+    tagDescription = fs.readFileSync(tagDescriptionPath, "utf-8");
+  } else if (description === true) {
     const tagDescriptionPath = path.resolve(__dirname, "../.tag-description");
 
     if (!fs.existsSync(tagDescriptionPath)) {
@@ -108,7 +116,9 @@ export const getVersion = (options: Partial<GitTagOptions>, packageJson: any) =>
   }`;
 
 export const getDescription = async (options: Partial<GitTagOptions>) =>
-  options.description ? await waitForDescription(options.description) : [""];
+  options.description || options.descriptionFile ? 
+    await waitForDescription(options.description, options.descriptionFile) :
+    [""];
 
 export const getReleaseName = (
   config: Config,

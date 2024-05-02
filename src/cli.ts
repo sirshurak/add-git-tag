@@ -39,6 +39,10 @@ program
     "Description for the tag. Default: empty"
   )
   .option(
+    "-df, --description-file <descriptionFile>",
+    "Description file for the tag, this will ignore description option. Default: empty. Ex: --description-file path/to/description/file"
+  )
+  .option(
     "-r, --release <releaser>",
     "Release a version for remote integration. Possible values (jira). Ex: --release jira"
   )
